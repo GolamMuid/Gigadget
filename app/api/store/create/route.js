@@ -101,3 +101,31 @@ export async function POST(request) {
     );
   }
 }
+
+// ? Check if the user have already registered a store. If yes, send the status of the store
+
+export async function GET(request) {
+  try {
+    const { userId } = getAuth(request);
+
+    // * Check if user have already registered a store
+
+    const store = await prisma.store.findFirst({
+      where: { userId: userId },
+    });
+
+    // * if a store is already registered then send status of the user
+
+    if (store) {
+      return NextResponse.json({ status: store.status });
+    }
+
+    return NextResponse.json({ status: "not registered" });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: error.code || error.message },
+      { status: 400 }
+    );
+  }
+}
